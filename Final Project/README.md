@@ -9,5 +9,6 @@ The documents included in this section include my code in R to create the follow
 * Most Frequent Day by Month
 * Total Yearly Riders by Month
 
-In the Summary.pdf, you can read my final report.
+Looking at the FinalSummary.Rmd file, you can see my R markdown file for my final summary report.
+In the FinalSummary.pdf, you can read a pdf version of my final report.
 This includes and introduction, the methods that I used, the results of my analysis including visualizations, and my conclusion and further discussions section. 
