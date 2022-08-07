@@ -1,0 +1,148 @@
+---
+title: "Cyclistic Bikes Annual Members vs. Casual Members"
+author: "Jessica Bolewitz"
+date: '2022-06-15'
+output:
+  pdf_document: default
+  html_document: default
+fontsize: 12pt
+---
+
+```{r setup, echo=FALSE, include=FALSE }
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(plotly)
+library(knitr)
+knitr::opts_chunk$set(eval = TRUE, include = TRUE)
+```
+
+# Introduction
+How do annual members and casual riders use Cyclistic bikes differently?  We will be taking a look at data collected over 2021 to analyze and compare the habits of these riders.
+
+&nbsp;
+
+Using Cyclistic Bike data, we will look at:
+
+  - the total number of users throughout the year
+  - riding habits during the week
+  - average Ride Length
+
+After looking through the data, we will provide some next steps for Cyclistic Bikes that could help encourage casual riders to become annual members.
+
+
+
+# Methods
+```{r data-import, echo=FALSE, include=FALSE}
+library(readxl)
+summary <- read_excel("C:\\Users\\jessi\\OneDrive\\Documents\\Data_Analytics\\Google_Data_Analytics_Program\\Case_Study\\Case_Study_Bike_Share\\Year_Summary.xlsx")
+View(summary)
+```
+The first step is to clean and get accustomed to the data. All of the data I used came directly from Cyclistic Bikes [here](https://divvy-tripdata.s3.amazonaws.com/index.html). I chose to use clean the data in excel by filtering out blank cells, or cells that were corrupted, which were mostly found in the areas of starting and ending stations. Since I was unable to contact Cyclistic Bikes to get more insight into these missing cells, I decided to take them out of the process all together rather than make assumptions of what they could be. This process is a perfect time to get familiar with the data and to start looking at any trends there might be. After that I created two more rows in the data by calculating the ride length for each rider and the day of the week of each ride. By doing this, I was able to find a pattern in both areas. After that I made the data more broad by calcualting the average ride length, total number of users, and average day of the week by month for both the casual riders and annual members. After cleaning the data, I used R Studio to create visualizations for these three topics.
+
+\newpage
+
+# Results
+
+## Total Number of Users Throughout the Year
+
+First we will look at the basics.  What trend(s) do we see with the number of casual riders and annual members during the year?
+Creating a line graph, we can see that the number of casual riders peaks during the summer month, with over 50,000 more riders in July than annual members.  The total number of casual riders and annual members are similar in June and August, and then for the rest of the year, annual members have a higher number of total of users.  
+
+&nbsp;
+
+```{r total users, echo=FALSE, warning=FALSE}
+#Total Number of Users Throughout the Year
+p1 <- ggplot(data=summary, 
+                      aes(x=month, y=total, color=member_casual, group=member_casual))+ #data being used
+  geom_line(size=1)+ #line graph, line size=1
+  labs(x="Month", y="Number of Riders", caption= "Source: Cyclistic (Motivate International Inc.)", 
+       title= "Total Yearly Riders", subtitle= "Member vs. Casual Riders")+ #labels and titles
+  theme(axis.text.x = element_text(angle= 90, vjust = 0.5, hjust = 1))+ #changes angle of x-axis tick labels
+  scale_x_discrete("Month", limits = month.name)+  # months not in alphabetical order
+  scale_y_continuous(labels  = 
+                       label_number(scale = 1e0, accuracy = 1)) #changes y values to big number
+```
+
+```{r p1, echo=FALSE, fig.align='center', fig.height=3, fig.width=5, warning=FALSE}
+print(p1)
+```
+
+&nbsp;
+
+## Most Frequent Day by Month
+
+Next we will look at how annual members and casual riders use Cyclistic Bikes during the week. Looking at the scatterplot for casual riders, we can see a clear pattern that on average, casual riders use Cyclistic Bikes  on the weekend more than during the work week.  While annual members tend to use Cyclistic Bikes all throughout the work week and weekend, there isn't a clear pattern of usage.    
+
+&nbsp; 
+
+```{r warning=FALSE, echo= FALSE}
+#Most Frequent Day by Month Scatter Plots
+p2 <- ggplot(summary, #data being used
+            aes(x=month, y=mode.day_of_week, color=member_casual))+  #which elements are on each axis
+  geom_point()+ #Scatter plot, shape and color different for casual and member riders
+  labs(caption= "Source: Cyclistic (Motivate International Inc.)", 
+       title="Most Frequent Day of the Week by Month", 
+       subtitle="Member vs. Casual Riders")+ #gives graph title, subtitle, and caption
+  scale_color_discrete(name= "Rider Type", breaks= c("casual", "member"), labels= c("Casual", "Member"))+
+  theme(axis.text.x = element_text(angle= 90, vjust = 0.5, hjust = 1))+ #changes angle of x-axis tick labels
+  scale_x_discrete("Month", limits = month.name)+ #Changed from alphabetical to month order
+  #Changes y axis tick labels and width
+  scale_y_discrete("Day of the Week",
+                   limits= c(1,2,3,4,5,6,7),
+                   breaks= c(1, 2, 3, 4, 5, 6, 7), position= 'left',
+                   labels= c("1"="Sunday", "2"="Monday", "3"="Tuesday", "4"="Wednesday", "5"="Thursday", "6"="Friday", "7"="Saturday"))+
+   facet_wrap(~member_casual)
+```
+
+```{r p2, echo=FALSE, fig.align='center', fig.height=3, fig.width=6, warning=FALSE}
+print(p2)
+```
+
+&nbsp;
+
+## Average Ride Length
+
+Last, we will look at the average ride length of annual members and casual riders for each month during the year. Looking at the bar chart, it is easily seen that casual riders on average use Cyclistic Bikes for longer periods of time for each ride. It was found that for each month casual riders, on average, rode for at least 10 minutes longer.   
+
+&nbsp;
+
+```{r avg ride length, echo=FALSE}
+
+#Average Ride Length Bar Chart (in minutes)
+p3 <- ggplot(data=summary, #data being used
+             aes(x=month, y=avg.ride_length, fill= member_casual))+ 
+  geom_bar(stat= "identity", position= "dodge")+ #bar chart with two variables
+  labs(x= "Month", y= "Average Ride Length (in minutes)", 
+       caption= "Source: Cyclistic (Motivate International Inc.)", 
+       title= "Average Ride Length by Month",
+       subtitle= "Member vs. Casual Riders")+ #labels and captions
+  theme(axis.text.x = element_text(angle= 90, vjust = 0.5, hjust = 1))+ # month names perpendicular
+  scale_x_discrete("Month", limits = month.name) #months not alphabetical
+
+```
+
+```{r p3, echo=FALSE, fig.align='center', fig.height=3, fig.width=5, warning=FALSE}
+print(p3)
+```
+
+&nbsp;
+
+# Conclusions and Discussion
+Through this analysis it was found that there are ways in which annual members and casual riders use Cyclistic Bikes differently.  These differences include the total number of users throughout the year, usage during the week, and the average ride length for each month. Casual riders use Cyclistic Bikes less often than annual members throughout the year except for summer months (June-August), casual riders more often use Cyclistic Bikes on the weekends while annual members use the bikes throughout the week, and casual riders tend to use Cyclistic Bikes for longer periods of time for each ride compared to annual members.
+
+&nbsp;
+
+Seeing these differences, some next steps could include:
+
+  * promote annual memberships during summer month
+  * offering deals for annual memberships for weekends
+  * having annual members pay less per minute after going over the initial threshold of a ride
+
+&nbsp;
+
+
+
+# References
+All data comes from:
+https://divvy-tripdata.s3.amazonaws.com/index.html
